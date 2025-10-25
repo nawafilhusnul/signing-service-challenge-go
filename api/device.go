@@ -24,7 +24,7 @@ func (s *Server) CreateDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := s.repository.Create(&domain.Device{
+	err := s.deviceService.CreateDevice(&domain.Device{
 		ID:               req.ID,
 		Algorithm:        req.Algorithm,
 		Label:            req.Label,

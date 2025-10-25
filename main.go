@@ -5,16 +5,18 @@ import (
 
 	"github.com/fiskaly/coding-challenges/signing-service-challenge/api"
 	"github.com/fiskaly/coding-challenges/signing-service-challenge/persistence"
+	"github.com/fiskaly/coding-challenges/signing-service-challenge/service"
 )
 
 const (
 	ListenAddress = ":8080"
-	// TODO: add further configuration parameters here ...
 )
 
 func main() {
 	repository := persistence.NewInMemoryRepository()
-	server := api.NewServer(ListenAddress, repository)
+	deviceService := service.NewDeviceService(repository)
+	transactionService := service.NewTransactionService(repository)
+	server := api.NewServer(ListenAddress, deviceService, transactionService)
 
 	if err := server.Run(); err != nil {
 		log.Fatal("Could not start server on ", ListenAddress)
