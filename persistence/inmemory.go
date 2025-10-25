@@ -30,7 +30,7 @@ func (r *InMemoryRepository) Create(device *domain.Device) error {
 	return nil
 }
 
-func (r *InMemoryRepository) Get(id string) (*domain.Device, error) {
+func (r *InMemoryRepository) GetByID(id string) (*domain.Device, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
