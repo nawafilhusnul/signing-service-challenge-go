@@ -12,6 +12,30 @@ type ECCKeyPair struct {
 	Private *ecdsa.PrivateKey
 }
 
+func (kp ECCKeyPair) GetPrivateKeyPEM() []byte {
+	privateKeyBytes, err := x509.MarshalECPrivateKey(kp.Private)
+	if err != nil {
+		return nil
+	}
+
+	return pem.EncodeToMemory(&pem.Block{
+		Type:  "PRIVATE_KEY",
+		Bytes: privateKeyBytes,
+	})
+}
+
+func (kp ECCKeyPair) GetPublicKeyPEM() []byte {
+	publicKeyBytes, err := x509.MarshalPKIXPublicKey(kp.Public)
+	if err != nil {
+		return nil
+	}
+
+	return pem.EncodeToMemory(&pem.Block{
+		Type:  "PUBLIC_KEY",
+		Bytes: publicKeyBytes,
+	})
+}
+
 // ECCMarshaler can encode and decode an ECC key pair.
 type ECCMarshaler struct{}
 

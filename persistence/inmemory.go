@@ -53,20 +53,3 @@ func (r *InMemoryRepository) FindAll() ([]*domain.Device, error) {
 
 	return devices, nil
 }
-
-// SignTransaction signs a transaction.
-func (r *InMemoryRepository) SignTransaction(deviceID string, data []byte) (*domain.SignatureResult, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	// TODO: Implement signature logic.
-	_, exists := r.devices[deviceID]
-	if !exists {
-		return nil, domain.ErrDeviceNotFound
-	}
-
-	return &domain.SignatureResult{
-		Signature:  "",
-		SignedData: "",
-	}, nil
-}

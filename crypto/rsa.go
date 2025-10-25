@@ -12,6 +12,22 @@ type RSAKeyPair struct {
 	Private *rsa.PrivateKey
 }
 
+func (kp RSAKeyPair) GetPrivateKeyPEM() []byte {
+	privateKeyBytes := x509.MarshalPKCS1PrivateKey(kp.Private)
+	return pem.EncodeToMemory(&pem.Block{
+		Type:  "RSA_PRIVATE_KEY",
+		Bytes: privateKeyBytes,
+	})
+}
+
+func (kp RSAKeyPair) GetPublicKeyPEM() []byte {
+	publicKeyBytes := x509.MarshalPKCS1PublicKey(kp.Public)
+	return pem.EncodeToMemory(&pem.Block{
+		Type:  "RSA_PUBLIC_KEY",
+		Bytes: publicKeyBytes,
+	})
+}
+
 // RSAMarshaler can encode and decode an RSA key pair.
 type RSAMarshaler struct{}
 
