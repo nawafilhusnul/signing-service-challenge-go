@@ -46,7 +46,7 @@ func (r *InMemoryRepository) FindAll() ([]*domain.Device, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	devices := make([]*domain.Device, 0, len(r.devices))
+	devices := make([]*domain.Device, 0)
 	for _, device := range r.devices {
 		devices = append(devices, device)
 	}
