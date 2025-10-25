@@ -1,3 +1,55 @@
 package persistence
 
-// TODO: in-memory persistence ...
+import (
+	"sync"
+
+	"github.com/fiskaly/coding-challenges/signing-service-challenge/domain"
+)
+
+type InMemoryRepository struct {
+	mu      sync.RWMutex
+	devices map[string]*domain.Device
+}
+
+func NewInMemoryRepository() Repository {
+	return &InMemoryRepository{
+		mu:      sync.RWMutex{},
+		devices: make(map[string]*domain.Device),
+	}
+}
+
+func (r *InMemoryRepository) Create(device *domain.Device) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if _, exists := r.devices[device.ID]; exists {
+		return domain.ErrDeviceAlreadyExists
+	}
+
+	r.devices[device.ID] = device
+	return nil
+}
+
+func (r *InMemoryRepository) Get(id string) (*domain.Device, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	device, exists := r.devices[id]
+	if !exists {
+		return nil, domain.ErrDeviceNotFound
+	}
+
+	return device, nil
+}
+
+func (r *InMemoryRepository) FindAll() ([]*domain.Device, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	devices := make([]*domain.Device, 0, len(r.devices))
+	for _, device := range r.devices {
+		devices = append(devices, device)
+	}
+
+	return devices, nil
+}
