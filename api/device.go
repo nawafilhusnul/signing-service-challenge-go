@@ -52,6 +52,11 @@ func (s *Server) SignTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if req.Data == "" {
+		WriteErrorResponse(w, http.StatusBadRequest, []string{domain.ErrEmptyData.Error()})
+		return
+	}
+
 	result, err := s.deviceService.SignTransaction(deviceId, req.Data)
 	if err != nil {
 		switch err {
