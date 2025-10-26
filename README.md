@@ -4,8 +4,31 @@ RESTful API for cryptographic signature devices with strictly monotonic counters
 
 ## Quick Start
 
+Before running the server, make sure you have Go installed. Go version should be 1.20 or higher.
+
+Check your Go version by running:
+
+```bash
+go version
+```
+
+If you don't have Go installed, you can download it from [here](https://golang.org/dl/).
+
+Then you need to tidy up the dependencies by running:
+
+```bash
+go mod tidy
+```
+
+To run the server, use the following command:
+
 ```bash
 go run main.go                              # Server on :8080
+```
+
+To run the tests, use the following command:
+
+```bash
 go test ./...                               # Run tests
 go test -race ./...                         # Race detector
 go test -coverprofile=coverage.out ./...    # Coverage report
