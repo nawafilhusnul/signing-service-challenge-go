@@ -65,3 +65,19 @@ func (r *InMemoryRepository) Update(device *domain.Device) error {
 	r.devices[device.ID] = device
 	return nil
 }
+
+func (r *InMemoryRepository) UpdateAtomic(deviceID string, updateFn func(*domain.Device) error) (*domain.Device, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	device, exists := r.devices[deviceID]
+	if !exists {
+		return nil, domain.ErrDeviceNotFound
+	}
+
+	if err := updateFn(device); err != nil {
+		return nil, err
+	}
+
+	return device, nil
+}

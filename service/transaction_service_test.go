@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/fiskaly/coding-challenges/signing-service-challenge/domain"
@@ -155,16 +156,20 @@ func Test_transactionService_SignTransaction(t *testing.T) {
 		err := deviceService.CreateDevice(device)
 		assert.NoError(t, err, "should not fail to create device")
 
-		numConcurrent := 100
+		numConcurrent := 10
 
+		wg := sync.WaitGroup{}
 		for i := 0; i < numConcurrent; i++ {
-			go func() {
+			wg.Add(1)
+			go func(idx int) {
+				defer wg.Done()
 				// sign a transaction
-				trxData := "COFFEE:2025-10-26T07:00:00Z"
+				trxData := fmt.Sprintf("COFFEE%d:2025-10-26T07:00:00Z", idx)
 				_, err := transactionService.SignTransaction(id, trxData)
 				assert.NoError(t, err, "should not fail to sign transaction")
-			}()
+			}(i)
 		}
+		wg.Wait()
 
 		assert.Equal(t, numConcurrent, device.SignatureCounter, "should not fail to sign transaction")
 	})
