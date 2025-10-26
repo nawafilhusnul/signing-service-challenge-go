@@ -204,3 +204,50 @@ func TestInMemoryRepository_FindAll(t *testing.T) {
 		assert.Equal(t, len(got), len(devices))
 	})
 }
+
+func TestInMemoryRepository_Update(t *testing.T) {
+	t.Run("update existing device", func(t *testing.T) {
+		r := persistence.NewInMemoryRepository()
+
+		// prepare a device to be asserted
+		device := &domain.Device{
+			ID:               "1",
+			Algorithm:        "RSA",
+			Label:            "Test Device",
+			SignatureCounter: 0,
+			LastSignature:    "",
+			PrivateKey:       "",
+			PublicKey:        "",
+			CreatedAt:        time.Now(),
+		}
+		err := r.Create(device)
+		assert.NoError(t, err)
+
+		_, gotErr := r.Update(device.ID, func(device *domain.Device) error {
+			device.Label = "Updated Device"
+			device.SignatureCounter++
+			device.LastSignature = "Updated Signature"
+			return nil
+		})
+		assert.NoError(t, gotErr)
+
+		got, gotErr := r.GetByID(device.ID)
+		assert.NoError(t, gotErr)
+
+		assert.Equal(t, got.Label, "Updated Device")
+		assert.Equal(t, got.SignatureCounter, 1)
+		assert.Equal(t, got.LastSignature, "Updated Signature")
+	})
+
+	t.Run("update non existing device", func(t *testing.T) {
+		r := persistence.NewInMemoryRepository()
+		_, gotErr := r.Update("1", func(device *domain.Device) error {
+			device.Label = "Updated Device"
+			device.SignatureCounter++
+			device.LastSignature = "Updated Signature"
+			return nil
+		})
+		assert.Error(t, gotErr)
+		assert.EqualError(t, gotErr, domain.ErrDeviceNotFound.Error())
+	})
+}
