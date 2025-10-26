@@ -49,7 +49,7 @@ func (s *deviceService) CreateDevice(device *domain.Device) error {
 func (s *deviceService) SignTransaction(deviceID string, data string) (*domain.SignatureResult, error) {
 	var result *domain.SignatureResult
 
-	_, err := s.repository.UpdateAtomic(deviceID, func(device *domain.Device) error {
+	_, err := s.repository.Update(deviceID, func(device *domain.Device) error {
 		signer, err := crypto.NewSignerFromDevice(device.Algorithm, []byte(device.PrivateKey))
 		if err != nil {
 			return err

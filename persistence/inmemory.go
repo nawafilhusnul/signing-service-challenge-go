@@ -54,19 +54,7 @@ func (r *InMemoryRepository) FindAll() ([]*domain.Device, error) {
 	return devices, nil
 }
 
-func (r *InMemoryRepository) Update(device *domain.Device) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	if _, exists := r.devices[device.ID]; !exists {
-		return domain.ErrDeviceNotFound
-	}
-
-	r.devices[device.ID] = device
-	return nil
-}
-
-func (r *InMemoryRepository) UpdateAtomic(deviceID string, updateFn func(*domain.Device) error) (*domain.Device, error) {
+func (r *InMemoryRepository) Update(deviceID string, updateFn func(*domain.Device) error) (*domain.Device, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
