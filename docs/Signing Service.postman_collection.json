@@ -1,0 +1,394 @@
+{
+	"info": {
+		"_postman_id": "360257b8-f74c-47cf-87d0-eb589ccbae96",
+		"name": "Signing Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24387409"
+	},
+	"item": [
+		{
+			"name": "Register Device",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"{{$randomUUID}}\",\n    \"algorithm\": \"ECC\",\n    \"label\":\"Signature Device with ECC\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/v0/devices",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"v0",
+						"devices"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Alg ECC: Success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"{{$randomUUID}}\",\n    \"algorithm\": \"ECC\",\n    \"label\": \"Signature Device with ECC\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v0/devices",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v0",
+								"devices"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 26 Oct 2025 06:35:11 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "433"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"id\": \"938e13ec-4cc6-4fc5-9ef8-9651274d5733\",\n        \"algorithm\": \"ECC\",\n        \"label\": \"Signature Device with ECC\",\n        \"signatureCounter\": 0,\n        \"createdAt\": \"2025-10-26T16:34:34.804312+07:00\"\n    }\n}"
+				},
+				{
+					"name": "Alg RSA: Success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"{{$randomUUID}}\",\n    \"algorithm\": \"RSA\",\n    \"label\": \"Signature Device with RSA\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v0/devices",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v0",
+								"devices"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 26 Oct 2025 06:35:11 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "433"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"id\": \"1aedd2c9-4a2e-4501-b731-474f8420176b\",\n        \"algorithm\": \"RSA\",\n        \"label\": \"Signature Device with RSA\",\n        \"signatureCounter\": 0,\n        \"createdAt\": \"2025-10-26T16:35:53.107422+07:00\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/v0/health",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"v0",
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sign Transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\":\"BOOKS:2025-26-10T07:00:00Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/v0/devices/:deviceId/sign",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"v0",
+						"devices",
+						":deviceId",
+						"sign"
+					],
+					"variable": [
+						{
+							"key": "deviceId",
+							"value": "c258cd99-3224-498d-8841-03cdfe7defeb"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Success Sign",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\":\"BOOKS:2025-26-10T07:00:00Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v0/devices/:deviceId/sign",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"devices",
+								":deviceId",
+								"sign"
+							],
+							"variable": [
+								{
+									"key": "deviceId",
+									"value": "54e1abf9-e7f3-45d8-b204-5da7c1fb4121"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 26 Oct 2025 09:29:44 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "155"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"signedData\": \"2_BOOKS:2025-26-10T07:00:00Z_KcFpddLuEv9Z2iupRIBYHxDJBJTcbfHGRPSxwLBl/bU6JYku3nuWp10M0MYCzjH6vU6JCpsUPh7Qag4N3alsPA\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Get Device Detail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/v0/devices/:deviceId",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"v0",
+						"devices",
+						":deviceId"
+					],
+					"variable": [
+						{
+							"key": "deviceId",
+							"value": "54e1abf9-e7f3-45d8-b204-5da7c1fb4121"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Success Get Detail",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"{{$randomUUID}}\",\n    \"algorithm\": \"ECC\",\n    \"label\":\"Signature Device 1\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v0/devices/:deviceId",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"devices",
+								":deviceId"
+							],
+							"variable": [
+								{
+									"key": "deviceId",
+									"value": "54e1abf9-e7f3-45d8-b204-5da7c1fb4121"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 26 Oct 2025 09:30:05 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "394"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"id\": \"54e1abf9-e7f3-45d8-b204-5da7c1fb4121\",\n        \"algorithm\": \"RSA\",\n        \"label\": \"Signature Device 1\",\n        \"signatureCounter\": 3,\n        \"publicKey\": \"-----BEGIN RSA_PUBLIC_KEY-----\\nMEgCQQC6f/NfAnlg8QPDYtq92dnSaW1ZpTJEm4UAmAcS9tiHQB7rYeWYX3u/7eve\\nfdKaI9lz17mlaWoc1N8Vfg4271UfAgMBAAE=\\n-----END RSA_PUBLIC_KEY-----\\n\",\n        \"createdAt\": \"2025-10-26T16:29:15.119056+07:00\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Find All Devices",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/v0/devices",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"v0",
+						"devices"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Success Get List Devices",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v0/devices",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"devices"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 26 Oct 2025 09:36:59 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "640"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": [\n        {\n            \"id\": \"c258cd99-3224-498d-8841-03cdfe7defeb\",\n            \"algorithm\": \"RSA\",\n            \"label\": \"Signature Device 1\",\n            \"signatureCounter\": 2,\n            \"createdAt\": \"2025-10-26T16:34:27.897758+07:00\"\n        },\n        {\n            \"id\": \"938e13ec-4cc6-4fc5-9ef8-9651274d5733\",\n            \"algorithm\": \"ECC\",\n            \"label\": \"\",\n            \"signatureCounter\": 0,\n            \"createdAt\": \"2025-10-26T16:34:34.804312+07:00\"\n        },\n        {\n            \"id\": \"1aedd2c9-4a2e-4501-b731-474f8420176b\",\n            \"algorithm\": \"RSA\",\n            \"label\": \"Signature Device with RSA\",\n            \"signatureCounter\": 0,\n            \"createdAt\": \"2025-10-26T16:35:53.107422+07:00\"\n        }\n    ]\n}"
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

@@ -34,6 +34,8 @@ go test -race ./...                         # Race detector
 go test -coverprofile=coverage.out ./...    # Coverage report
 ```
 
+I have included the Postman collection in the `docs` directory. You can import it from there.
+
 ## API
 
 ```bash
