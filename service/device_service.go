@@ -1,6 +1,8 @@
 package service
 
 import (
+	"encoding/base64"
+
 	"github.com/fiskaly/coding-challenges/signing-service-challenge/crypto"
 	"github.com/fiskaly/coding-challenges/signing-service-challenge/domain"
 	"github.com/fiskaly/coding-challenges/signing-service-challenge/persistence"
@@ -19,6 +21,7 @@ func NewDeviceService(repository persistence.Repository) DeviceService {
 }
 
 func (s *deviceService) CreateDevice(device *domain.Device) error {
+	lastSignature := base64.RawStdEncoding.EncodeToString([]byte(device.ID))
 	gen, err := crypto.NewGenerator(device.Algorithm)
 	if err != nil {
 		return err
@@ -31,6 +34,10 @@ func (s *deviceService) CreateDevice(device *domain.Device) error {
 
 	device.PrivateKey = string(keyPair.GetPrivateKeyPEM())
 	device.PublicKey = string(keyPair.GetPublicKeyPEM())
+
+	// pre-sign the device
+	device.SignatureCounter = 0
+	device.LastSignature = lastSignature
 
 	return s.repository.Create(device)
 }

@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/fiskaly/coding-challenges/signing-service-challenge/domain"
 )
 
 func (s *Server) SignTransaction(w http.ResponseWriter, r *http.Request) {
@@ -21,5 +23,18 @@ func (s *Server) SignTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: implement
+	device, err := s.transactionService.SignTransaction(req.DeviceID, req.Data)
+	if err != nil {
+		switch err {
+		case domain.ErrDeviceNotFound:
+			WriteErrorResponse(w, http.StatusNotFound, []string{err.Error()})
+		case domain.ErrInvalidDeviceID:
+			WriteErrorResponse(w, http.StatusBadRequest, []string{err.Error()})
+		default:
+			WriteErrorResponse(w, http.StatusInternalServerError, []string{err.Error()})
+		}
+		return
+	}
+
+	WriteAPIResponse(w, http.StatusOK, device)
 }
