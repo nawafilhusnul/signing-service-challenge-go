@@ -67,3 +67,26 @@ func (s *Server) SignTransaction(w http.ResponseWriter, r *http.Request) {
 
 	WriteAPIResponse(w, http.StatusOK, result)
 }
+
+func (s *Server) GetDevice(w http.ResponseWriter, r *http.Request) {
+	deviceId := mux.Vars(r)["deviceId"]
+	if deviceId == "" {
+		WriteErrorResponse(w, http.StatusBadRequest, []string{"Device ID is required"})
+		return
+	}
+
+	device, err := s.deviceService.GetDevice(deviceId)
+	if err != nil {
+		switch err {
+		case domain.ErrDeviceNotFound:
+			WriteErrorResponse(w, http.StatusNotFound, []string{err.Error()})
+		case domain.ErrInvalidDeviceID:
+			WriteErrorResponse(w, http.StatusBadRequest, []string{err.Error()})
+		default:
+			WriteErrorResponse(w, http.StatusInternalServerError, []string{err.Error()})
+		}
+		return
+	}
+
+	WriteAPIResponse(w, http.StatusOK, device)
+}

@@ -11,6 +11,7 @@ import (
 
 type DeviceService interface {
 	CreateDevice(device *domain.Device) error
+	GetDevice(deviceID string) (*domain.Device, error)
 	SignTransaction(deviceID string, data string) (*domain.SignatureResult, error)
 }
 
@@ -76,4 +77,8 @@ func (s *deviceService) SignTransaction(deviceID string, data string) (*domain.S
 	}
 
 	return result, nil
+}
+
+func (s *deviceService) GetDevice(deviceID string) (*domain.Device, error) {
+	return s.repository.GetByID(deviceID)
 }

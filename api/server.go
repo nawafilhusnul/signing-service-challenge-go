@@ -53,6 +53,9 @@ func (s *Server) Run() error {
 	// Transaction signing
 	r.HandleFunc("/api/v0/devices/{deviceId}/sign", s.SignTransaction).Methods(http.MethodPost)
 
+	// Device retrieval
+	r.HandleFunc("/api/v0/devices/{deviceId}", s.GetDevice).Methods(http.MethodGet)
+
 	return http.ListenAndServe(s.listenAddress, r)
 }
 
