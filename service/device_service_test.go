@@ -220,3 +220,77 @@ func Test_deviceService_SignTransaction(t *testing.T) {
 			fmt.Sprintf("counter should be %d after %d concurrent transactions", numConcurrent, numConcurrent))
 	})
 }
+
+func Test_deviceService_FindAll(t *testing.T) {
+	// spawn repository
+	repository := persistence.NewInMemoryRepository()
+
+	// spawn device service
+	deviceService := service.NewDeviceService(repository)
+
+	// create device
+	id := uuid.New().String()
+	device := &domain.Device{
+		ID:               id,
+		Algorithm:        "ECC",
+		Label:            "device-1",
+		PrivateKey:       "",
+		PublicKey:        "",
+		SignatureCounter: 0,
+		LastSignature:    "",
+	}
+
+	err := deviceService.CreateDevice(device)
+	assert.NoError(t, err, "should not fail to create device")
+	// create another device
+	id2 := uuid.New().String()
+	device2 := &domain.Device{
+		ID:               id2,
+		Algorithm:        "ECC",
+		Label:            "device-2",
+		PrivateKey:       "",
+		PublicKey:        "",
+		SignatureCounter: 0,
+		LastSignature:    "",
+	}
+
+	err = deviceService.CreateDevice(device2)
+	assert.NoError(t, err, "should not fail to create device")
+
+	// find all devices
+	devices, err := deviceService.FindAll()
+	assert.NoError(t, err, "should not fail to find all devices")
+	assert.Equal(t, 2, len(devices), "should find 2 devices")
+}
+
+func Test_deviceService_GetDevice(t *testing.T) {
+	// spawn repository
+	repository := persistence.NewInMemoryRepository()
+
+	// spawn device service
+	deviceService := service.NewDeviceService(repository)
+
+	// create device
+	id := uuid.New().String()
+	device := &domain.Device{
+		ID:               id,
+		Algorithm:        "ECC",
+		Label:            "device-1",
+		PrivateKey:       "",
+		PublicKey:        "",
+		SignatureCounter: 0,
+		LastSignature:    "",
+	}
+
+	err := deviceService.CreateDevice(device)
+	assert.NoError(t, err, "should not fail to create device")
+
+	// get device
+	gotDevice, err := deviceService.GetDevice(id)
+	assert.NoError(t, err, "should not fail to get device")
+	assert.Equal(t, id, gotDevice.ID)
+
+	decodedID, err := base64.RawStdEncoding.DecodeString(gotDevice.LastSignature)
+	assert.NoError(t, err, "should not fail to decode device last signature")
+	assert.Equal(t, id, string(decodedID), "device last signature should match device id")
+}
