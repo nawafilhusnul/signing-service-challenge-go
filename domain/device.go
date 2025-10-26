@@ -9,7 +9,7 @@ type Device struct {
 	SignatureCounter int       `json:"signatureCounter"`
 	LastSignature    string    `json:"-"`
 	PrivateKey       string    `json:"-"`
-	PublicKey        string    `json:"-"`
+	PublicKey        string    `json:"publicKey"`
 	CreatedAt        time.Time `json:"createdAt"`
 }
 
