@@ -29,9 +29,11 @@ go run main.go                              # Server on :8080
 To run the tests, use the following command:
 
 ```bash
-go test ./...                               # Run tests
+go test ./... -cover                        # Run tests with coverage
 go test -race ./...                         # Race detector
+go test -v ./...                            # Verbose output
 go test -coverprofile=coverage.out ./...    # Coverage report
+go tool cover -html=coverage.out            # Open coverage report in browser
 ```
 
 I have included the Postman collection in the `docs` directory. You can import it from there.
