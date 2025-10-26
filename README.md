@@ -1,88 +1,160 @@
-# Signature Service - Coding Challenge
+# Signing Service - Go Implementation
 
-## Instructions
+RESTful API for cryptographic signature devices with strictly monotonic counters and signature chaining (KassenSichV/RKSV compliance).
 
-This challenge is part of the software engineering interview process at fiskaly.
+## Quick Start
 
-If you see this challenge, you've passed the first round of interviews and are now at the second and last stage.
+```bash
+go run main.go                              # Server on :8080
+go test ./...                               # Run tests
+go test -race ./...                         # Race detector
+go test -coverprofile=coverage.out ./...    # Coverage report
+```
 
-We would like you to attempt the challenge below. You will then be able to discuss your solution in the skill-fit interview with two of our colleagues from the development department.
+## API
 
-The quality of your code is more important to us than the quantity.
+```bash
+# Create device (ECC or RSA)
+curl -X POST http://localhost:8080/api/v0/devices \
+  -d '{"id":"device-1","algorithm":"ECC","label":"Register 1"}'
 
-### Project Setup
+# Sign transaction
+curl -X POST http://localhost:8080/api/v0/devices/device-1/sign \
+  -d '{"data":"SALE:100.00:EUR"}'
+# Returns: {"signature":"...", "signedData":"0_SALE:100.00:EUR_base64(deviceId)"}
 
-For the challenge, we provide you with:
+# Get device
+curl http://localhost:8080/api/v0/devices/device-1
 
-- Go project containing the setup
-- Basic API structure and functionality
-- Encoding / decoding of different key types (only needed to serialize keys to a persistent storage)
-- Key generation algorithms (ECC, RSA)
-- Library to generate UUIDs, included in `go.mod`
+# List all devices
+curl http://localhost:8080/api/v0/devices
+```
 
-You can use these things as a foundation, but you're also free to modify them as you see fit.
+## Concurrency: Monotonic Counter
 
-### Prerequisites & Tooling
+**Challenge:** Multiple concurrent clients → race conditions, counter gaps, invalid signatures.
 
-- Golang (v1.20+)
+**Solution:** Execute Around pattern with mutex-protected atomic updates.
 
-### The Challenge
+```go
+// ❌ Naive - race condition
+device := repo.GetByID(id)
+device.Counter++
+repo.Update(device)
 
-The goal is to implement an API service that allows customers to create `signature devices` with which they can sign arbitrary transaction data.
+// ✅ Atomic update
+repo.Update(deviceID, func(device *Device) error {
+    securedData := fmt.Sprintf("%d_%s_%s", device.Counter, data, device.LastSignature)
+    signature := sign(securedData)
+    device.Counter++
+    device.LastSignature = signature
+    return nil
+})
+```
 
-#### Domain Description
+**Implementation:**
 
-The `signature service` can manage multiple `signature devices`. Such a device is identified by a unique identifier (e.g. UUID). For now you can pretend there is only one user / organization using the system (e.g. a dedicated node for them), therefore you do not need to think about user management at all.
+```go
+func (r *InMemoryRepository) Update(
+    deviceID string,
+    updateFn func(*domain.Device) error,
+) (*domain.Device, error) {
+    r.mu.Lock()
+    defer r.mu.Unlock()
 
-When creating the `signature device`, the client of the API has to choose the signature algorithm that the device will be using to sign transaction data. During the creation process, a new key pair (`public key` & `private key`) has to be generated and assigned to the device.
-
-The `signature device` should also have a `label` that can be used to display it in the UI and a `signature_counter` that tracks how many signatures have been created with this device. The `label` is provided by the user. The `signature_counter` shall only be modified internally.
-
-##### Signature Creation
-
-For the signature creation, the client will have to provide `data_to_be_signed` through the API. In order to increase the security of the system, we will extend this raw data with the current `signature_counter` and the `last_signature`.
-
-The resulting string (`secured_data_to_be_signed`) should follow this format: `<signature_counter>_<data_to_be_signed>_<last_signature_base64_encoded>`
-
-In the base case there is no `last_signature` (= `signature_counter == 0`). Use the `base64`-encoded device ID (`last_signature = base64(device.id)`) instead of the `last_signature`.
-
-This special string will be signed (`Signer.sign(secured_data_to_be_signed)`) and the resulting signature (`base64` encoded) will be returned to the client. The signature response could look like this:
-
-```json
-{ 
-    "signature": <signature_base64_encoded>,
-    "signed_data": "<signature_counter>_<data_to_be_signed>_<last_signature_base64_encoded>"
+    device := r.devices[deviceID]
+    if err := updateFn(device); err != nil {
+        return nil, err
+    }
+    return device, nil
 }
 ```
 
-After the signature has been created, the signature counter's value has to be incremented (`signature_counter += 1`).
+**Why it works:** Mutex serializes all counter updates. Only one goroutine can read-sign-increment at a time.
 
-#### API
+## Testing
 
-For now we need to provide two main operations to our customers:
+**Coverage:** Persistence 57.6% | Service 81.2% | API 75.0%
 
-- `CreateSignatureDevice(id: string, algorithm: 'ECC' | 'RSA', [optional]: label: string): CreateSignatureDeviceResponse`
-- `SignTransaction(deviceId: string, data: string): SignatureResponse`
+**Key tests:**
 
-Think of how to expose these operations through a RESTful HTTP-based API.
+- Device CRUD operations
+- Concurrent device creation (10 goroutines, only 1 succeeds for duplicate ID)
+- **Concurrent transaction signing** (10 goroutines → counter 0→10, no gaps)
+- API endpoints (201, 400, 404, 409 status codes)
+- Input validation and error handling
 
-In addition, `list / retrieval operations` for the resources generated in the previous operations should be made available to the customers.
+**Critical concurrent test:**
 
-#### QA / Testing
+```go
+// 10 goroutines sign simultaneously
+for i := 0; i < 10; i++ {
+    go func() {
+        deviceService.SignTransaction(deviceID, data)
+    }()
+}
+wg.Wait()
+assert.Equal(t, 10, device.SignatureCounter)  // ✅ No gaps
+```
 
-As we are in the business of compliance technology, we need to make sure that our implementation is verifiably correct. Think of an automatable way to assure the correctness (in this challenge: adherence to the specifications) of the system.
+## Architecture
 
-#### Technical Constraints & Considerations
+**Layers:** API → Service → Repository → Domain
 
-- The system will be used by many concurrent clients accessing the same resources.
-- The `signature_counter` has to be strictly monotonically increasing and ideally without any gaps.
-- The system currently only supports `RSA` and `ECDSA` as signature algorithms. Try to design the signing mechanism in a way that allows easy extension to other algorithms without changing the core domain logic.
-- For now it is enough to store signature devices in memory. Efficiency is not a priority for this. In the future we might want to scale out. As you design your storage logic, keep in mind that we may later want to switch to a relational database.
+**Key Patterns:**
 
-### AI Tools
+- **Repository:** Interface-based data access, easy to swap in-memory for database
+- **Dependency Injection:** Services depend on interfaces, improves testability
+- **Execute Around:** Atomic updates with automatic mutex management
+- **Factory:** Crypto algorithm selection (RSA/ECC)
 
-The use of AI tools to aid completing the challenge is permitted, but you will need to be able to reason about the design and implementation choices made when you reach the interview stage. Furthermore, if you used any AI tools, you need to clearly state which tools were used for different parts of the challenge. Ensure that you document this inside the `README` for your repository, so that it is visible to the reviewers.
+**Design Decisions:**
 
-### Credits
+- Single service layer (signing is a device operation)
+- gorilla/mux for path parameters and HTTP method routing
+- base64.RawStdEncoding for binary-safe JSON transmission
 
-This challenge is heavily influenced by the regulations for `KassenSichV` (Germany) as well as the `RKSV` (Austria) and our solutions for them.
+## AI Tools Usage
+
+**Tool:** Cascade (Claude AI)
+
+**Usage Breakdown:**
+
+- **Architecture (20%):** Brainstorming layered design, repository pattern
+- **Concurrency (15%):** Discussing Execute Around pattern for handling race condition
+- **Code (5%):** Repetitive test boilerplate only
+- **Debugging (25%):** Spotted bugs
+- **Documentation (70%):** README structure and content
+
+**Design Decisions:**
+
+- **Execute Around pattern** → ensures atomic read-modify-write
+  - Trade-off: Less flexible than separate lock/unlock, but safer (impossible to forget unlock)
+- **Repository pattern** → easy database migration later
+  - Trade-off: Extra abstraction layer, but decouples business logic from storage
+- **gorilla/mux** → path parameters and method routing out of the box
+  - Trade-off: External dependency, but saves manual parsing and reduces boilerplate
+- **Mutex serialization** → guarantees no counter gaps
+  - Trade-off: Limits throughput (one sign at a time per device), but ensures correctness
+
+## Assumptions & Limitations
+
+**Assumptions:**
+
+- Device IDs are unique and provided by client
+- Single server instance (no distributed locking needed)
+
+**Known Limitations:**
+
+- In-memory storage (data lost on restart)
+- No authentication/authorization
+- No signature verification endpoint
+- Mutex limits throughput to sequential signing per device
+
+**Time Spent:** ~10 hours
+
+---
+
+**Author:** Husnul Nawafil  
+**Date:** October 26, 2025  
+**Challenge:** fiskaly Signing Service Coding Challenge
