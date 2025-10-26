@@ -14,9 +14,10 @@ const (
 
 func main() {
 	repository := persistence.NewInMemoryRepository()
+
 	deviceService := service.NewDeviceService(repository)
-	transactionService := service.NewTransactionService(repository)
-	server := api.NewServer(ListenAddress, deviceService, transactionService)
+
+	server := api.NewServer(ListenAddress, deviceService)
 
 	log.Println("Server starting on port: ", ListenAddress)
 	if err := server.Run(); err != nil {

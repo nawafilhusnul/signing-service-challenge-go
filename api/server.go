@@ -20,17 +20,15 @@ type ErrorResponse struct {
 
 // Server manages HTTP requests and dispatches them to the appropriate services.
 type Server struct {
-	listenAddress      string
-	deviceService      service.DeviceService
-	transactionService service.TransactionService
+	listenAddress string
+	deviceService service.DeviceService
 }
 
 // NewServer is a factory to instantiate a new Server.
-func NewServer(listenAddress string, deviceService service.DeviceService, transactionService service.TransactionService) *Server {
+func NewServer(listenAddress string, deviceService service.DeviceService) *Server {
 	return &Server{
-		listenAddress:      listenAddress,
-		deviceService:      deviceService,
-		transactionService: transactionService,
+		listenAddress: listenAddress,
+		deviceService: deviceService,
 	}
 }
 

@@ -45,7 +45,7 @@ func (s *Server) SignTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	device, err := s.transactionService.SignTransaction(req.DeviceID, req.Data)
+	device, err := s.deviceService.SignTransaction(req.DeviceID, req.Data)
 	if err != nil {
 		switch err {
 		case domain.ErrDeviceNotFound:
