@@ -36,8 +36,6 @@ go test -coverprofile=coverage.out ./...    # Coverage report
 go tool cover -html=coverage.out            # Open coverage report in browser
 ```
 
-I have included the Postman collection in the `docs` directory. You can import it from there.
-
 ## API
 
 ```bash
@@ -56,6 +54,8 @@ curl http://localhost:8080/api/v0/devices/device-1
 # List all devices
 curl http://localhost:8080/api/v0/devices
 ```
+
+I have also included the Postman collection in the `docs` directory. You can import it from there to test the API using Postman.
 
 ## Concurrency: Monotonic Counter
 
