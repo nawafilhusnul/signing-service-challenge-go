@@ -52,8 +52,8 @@ func (s *Server) CreateDevice(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) SignTransaction(w http.ResponseWriter, r *http.Request) {
 	deviceId := mux.Vars(r)["deviceId"]
-	if deviceId == "" {
-		WriteErrorResponse(w, http.StatusBadRequest, []string{"Device ID is required"})
+	if !helper.IsValidUUID(deviceId) {
+		WriteErrorResponse(w, http.StatusBadRequest, []string{"Invalid Device ID. UUID format expected"})
 		return
 	}
 
@@ -91,8 +91,8 @@ func (s *Server) SignTransaction(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) GetDevice(w http.ResponseWriter, r *http.Request) {
 	deviceId := mux.Vars(r)["deviceId"]
-	if deviceId == "" {
-		WriteErrorResponse(w, http.StatusBadRequest, []string{"Device ID is required"})
+	if !helper.IsValidUUID(deviceId) {
+		WriteErrorResponse(w, http.StatusBadRequest, []string{"Invalid Device ID. UUID format expected"})
 		return
 	}
 
