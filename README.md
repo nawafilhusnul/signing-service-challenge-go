@@ -74,28 +74,7 @@ func (r *InMemoryRepository) Update(
 
 ## Testing
 
-**Coverage:** Persistence 57.6% | Service 81.2% | API 75.0%
-
-**Key tests:**
-
-- Device CRUD operations
-- Concurrent device creation (10 goroutines, only 1 succeeds for duplicate ID)
-- **Concurrent transaction signing** (10 goroutines → counter 0→10, no gaps)
-- API endpoints (201, 400, 404, 409 status codes)
-- Input validation and error handling
-
-**Critical concurrent test:**
-
-```go
-// 10 goroutines sign simultaneously
-for i := 0; i < 10; i++ {
-    go func() {
-        deviceService.SignTransaction(deviceID, data)
-    }()
-}
-wg.Wait()
-assert.Equal(t, 10, device.SignatureCounter)  // ✅ No gaps
-```
+**Coverage:** Persistence 96.3% | Service 87.5% | API 57.1%
 
 ## Architecture
 
