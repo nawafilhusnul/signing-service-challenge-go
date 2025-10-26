@@ -213,6 +213,10 @@ func Test_deviceService_SignTransaction(t *testing.T) {
 		}
 		wg.Wait()
 
-		assert.Equal(t, numConcurrent, device.SignatureCounter, "should not fail to sign transaction")
+		updatedDevice, err := repository.GetByID(id)
+		assert.NoError(t, err, "should be able to fetch device")
+
+		assert.Equal(t, numConcurrent, updatedDevice.SignatureCounter,
+			fmt.Sprintf("counter should be %d after %d concurrent transactions", numConcurrent, numConcurrent))
 	})
 }

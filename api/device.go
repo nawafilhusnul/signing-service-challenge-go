@@ -16,6 +16,20 @@ func (s *Server) CreateDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	errs := make([]string, 0)
+	if req.ID == "" {
+		errs = append(errs, "Device ID is required")
+	}
+
+	if req.Algorithm != domain.AlgorithmRSA && req.Algorithm != domain.AlgorithmECC {
+		errs = append(errs, "Algorithm is required")
+	}
+
+	if len(errs) > 0 {
+		WriteErrorResponse(w, http.StatusBadRequest, errs)
+		return
+	}
+
 	newDevice := domain.Device{
 		ID:        req.ID,
 		Algorithm: req.Algorithm,
@@ -52,8 +66,13 @@ func (s *Server) SignTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	errs := make([]string, 0)
 	if req.Data == "" {
-		WriteErrorResponse(w, http.StatusBadRequest, []string{domain.ErrEmptyData.Error()})
+		errs = append(errs, domain.ErrEmptyData.Error())
+	}
+
+	if len(errs) > 0 {
+		WriteErrorResponse(w, http.StatusBadRequest, errs)
 		return
 	}
 
