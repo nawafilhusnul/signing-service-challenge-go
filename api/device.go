@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fiskaly/coding-challenges/signing-service-challenge/domain"
+	"github.com/fiskaly/coding-challenges/signing-service-challenge/helper"
 	"github.com/gorilla/mux"
 )
 
@@ -17,12 +18,12 @@ func (s *Server) CreateDevice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	errs := make([]string, 0)
-	if req.ID == "" {
-		errs = append(errs, "Device ID is required")
+	if !helper.IsValidUUID(req.ID) {
+		errs = append(errs, "Invalid Device ID. UUID format expected")
 	}
 
 	if req.Algorithm != domain.AlgorithmRSA && req.Algorithm != domain.AlgorithmECC {
-		errs = append(errs, "Algorithm is required")
+		errs = append(errs, "Invalid Algorithm. Only RSA and ECC are supported")
 	}
 
 	if len(errs) > 0 {
