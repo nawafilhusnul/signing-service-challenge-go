@@ -22,10 +22,6 @@ func (s *Server) CreateDevice(w http.ResponseWriter, r *http.Request) {
 		errs = append(errs, "Invalid Device ID. UUID format expected")
 	}
 
-	if req.Algorithm != domain.AlgorithmRSA && req.Algorithm != domain.AlgorithmECC {
-		errs = append(errs, "Invalid Algorithm. Only RSA and ECC are supported")
-	}
-
 	if len(errs) > 0 {
 		WriteErrorResponse(w, http.StatusBadRequest, errs)
 		return
