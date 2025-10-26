@@ -29,8 +29,8 @@ func (s *deviceService) CreateDevice(device *domain.Device) error {
 		return err
 	}
 
-	device.PrivateKey = keyPair.GetPrivateKeyPEM()
-	device.PublicKey = keyPair.GetPublicKeyPEM()
+	device.PrivateKey = string(keyPair.GetPrivateKeyPEM())
+	device.PublicKey = string(keyPair.GetPublicKeyPEM())
 
 	return s.repository.Create(device)
 }

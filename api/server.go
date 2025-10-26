@@ -39,7 +39,7 @@ func (s *Server) Run() error {
 
 	mux.Handle("/api/v0/health", http.HandlerFunc(s.Health))
 
-	// TODO: register further HandlerFuncs here ...
+	mux.Handle("/api/v0/devices", http.HandlerFunc(s.CreateDevice))
 
 	return http.ListenAndServe(s.listenAddress, mux)
 }

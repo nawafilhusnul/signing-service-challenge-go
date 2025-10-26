@@ -24,19 +24,19 @@ func (s *Server) CreateDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := s.deviceService.CreateDevice(&domain.Device{
-		ID:               req.ID,
-		Algorithm:        req.Algorithm,
-		Label:            req.Label,
-		SignatureCounter: 0,
-		LastSignature:    "",
-		PrivateKey:       nil,
-		PublicKey:        nil,
-		CreatedAt:        time.Now(),
-	})
+	newDevice := domain.Device{
+		ID:        req.ID,
+		Algorithm: req.Algorithm,
+		Label:     req.Label,
+		CreatedAt: time.Now(),
+	}
+
+	err := s.deviceService.CreateDevice(&newDevice)
 	if err != nil {
 		switch err {
-		case domain.ErrInvalidAlgorithm, domain.ErrInvalidDeviceID, domain.ErrDeviceAlreadyExists:
+		case domain.ErrDeviceAlreadyExists:
+			WriteErrorResponse(w, http.StatusConflict, []string{err.Error()})
+		case domain.ErrInvalidAlgorithm, domain.ErrInvalidDeviceID:
 			WriteErrorResponse(w, http.StatusBadRequest, []string{err.Error()})
 		default:
 			WriteErrorResponse(w, http.StatusInternalServerError, []string{err.Error()})
@@ -44,5 +44,5 @@ func (s *Server) CreateDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	WriteAPIResponse(w, http.StatusCreated, nil)
+	WriteAPIResponse(w, http.StatusCreated, newDevice)
 }

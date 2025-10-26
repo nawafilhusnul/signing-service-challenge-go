@@ -25,8 +25,8 @@ func TestInMemoryRepository_Create(t *testing.T) {
 					Label:            "Test Device",
 					SignatureCounter: 0,
 					LastSignature:    "",
-					PrivateKey:       nil,
-					PublicKey:        nil,
+					PrivateKey:       "",
+					PublicKey:        "",
 					CreatedAt:        time.Now(),
 				},
 				wantErr:       false,
@@ -40,8 +40,8 @@ func TestInMemoryRepository_Create(t *testing.T) {
 					Label:            "Duplicate Device",
 					SignatureCounter: 0,
 					LastSignature:    "",
-					PrivateKey:       nil,
-					PublicKey:        nil,
+					PrivateKey:       "",
+					PublicKey:        "",
 					CreatedAt:        time.Now(),
 				},
 				wantErr:       true,
@@ -80,8 +80,8 @@ func TestInMemoryRepository_Create(t *testing.T) {
 						Label:            "Concurrent Device",
 						SignatureCounter: 0,
 						LastSignature:    "",
-						PrivateKey:       nil,
-						PublicKey:        nil,
+						PrivateKey:       "",
+						PublicKey:        "",
 						CreatedAt:        time.Now(),
 					}
 					done <- r.Create(device)
@@ -113,8 +113,8 @@ func TestInMemoryRepository_Create(t *testing.T) {
 						Label:            "Same Device",
 						SignatureCounter: 0,
 						LastSignature:    "",
-						PrivateKey:       nil,
-						PublicKey:        nil,
+						PrivateKey:       "",
+						PublicKey:        "",
 						CreatedAt:        time.Now(),
 					}
 					done <- r.Create(device)
@@ -144,8 +144,8 @@ func TestInMemoryRepository_GetByID(t *testing.T) {
 			Label:            "Test Device",
 			SignatureCounter: 0,
 			LastSignature:    "",
-			PrivateKey:       nil,
-			PublicKey:        nil,
+			PrivateKey:       "",
+			PublicKey:        "",
 			CreatedAt:        time.Now(),
 		}
 		err := r.Create(device)
@@ -178,8 +178,8 @@ func TestInMemoryRepository_FindAll(t *testing.T) {
 				Label:            "Test Device",
 				SignatureCounter: 0,
 				LastSignature:    "",
-				PrivateKey:       nil,
-				PublicKey:        nil,
+				PrivateKey:       "",
+				PublicKey:        "",
 				CreatedAt:        time.Now(),
 			},
 			{
@@ -188,8 +188,8 @@ func TestInMemoryRepository_FindAll(t *testing.T) {
 				Label:            "Test Device",
 				SignatureCounter: 0,
 				LastSignature:    "",
-				PrivateKey:       nil,
-				PublicKey:        nil,
+				PrivateKey:       "",
+				PublicKey:        "",
 				CreatedAt:        time.Now(),
 			},
 		}

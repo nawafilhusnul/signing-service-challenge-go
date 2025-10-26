@@ -8,8 +8,8 @@ type Device struct {
 	Label            string    `json:"label"`
 	SignatureCounter int       `json:"signature_counter"`
 	LastSignature    string    `json:"-"`
-	PrivateKey       []byte    `json:"-"`
-	PublicKey        []byte    `json:"public_key"`
+	PrivateKey       string    `json:"-"`
+	PublicKey        string    `json:"public_key"`
 	CreatedAt        time.Time `json:"created_at"`
 }
 
