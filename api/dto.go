@@ -7,5 +7,6 @@ type CreateDeviceRequest struct {
 }
 
 type SignTransactionRequest struct {
-	Data string `json:"data"`
+	DeviceID string `json:"deviceId"`
+	Data     string `json:"data"`
 }
