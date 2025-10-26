@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fiskaly/coding-challenges/signing-service-challenge/domain"
+	"github.com/gorilla/mux"
 )
 
 func (s *Server) CreateDevice(w http.ResponseWriter, r *http.Request) {
@@ -39,13 +40,19 @@ func (s *Server) CreateDevice(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) SignTransaction(w http.ResponseWriter, r *http.Request) {
+	deviceId := mux.Vars(r)["deviceId"]
+	if deviceId == "" {
+		WriteErrorResponse(w, http.StatusBadRequest, []string{"Device ID is required"})
+		return
+	}
+
 	var req SignTransactionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, []string{"Invalid JSON"})
 		return
 	}
 
-	device, err := s.deviceService.SignTransaction(req.DeviceID, req.Data)
+	result, err := s.deviceService.SignTransaction(deviceId, req.Data)
 	if err != nil {
 		switch err {
 		case domain.ErrDeviceNotFound:
@@ -58,5 +65,5 @@ func (s *Server) SignTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	WriteAPIResponse(w, http.StatusOK, device)
+	WriteAPIResponse(w, http.StatusOK, result)
 }
