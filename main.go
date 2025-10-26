@@ -18,6 +18,7 @@ func main() {
 	transactionService := service.NewTransactionService(repository)
 	server := api.NewServer(ListenAddress, deviceService, transactionService)
 
+	log.Println("Server starting on port: ", ListenAddress)
 	if err := server.Run(); err != nil {
 		log.Fatal("Could not start server on ", ListenAddress)
 	}

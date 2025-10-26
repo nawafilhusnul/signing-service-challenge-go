@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/fiskaly/coding-challenges/signing-service-challenge/service"
+	"github.com/gorilla/mux"
 )
 
 // Response is the generic API response container.
@@ -35,13 +36,26 @@ func NewServer(listenAddress string, deviceService service.DeviceService, transa
 
 // Run registers all HandlerFuncs for the existing HTTP routes and starts the Server.
 func (s *Server) Run() error {
-	mux := http.NewServeMux()
+	r := mux.NewRouter()
 
-	mux.Handle("/api/v0/health", http.HandlerFunc(s.Health))
+	// Set Content-Type header to application/json
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			next.ServeHTTP(w, r)
+		})
+	})
 
-	mux.Handle("/api/v0/devices", http.HandlerFunc(s.CreateDevice))
+	// Health check
+	r.HandleFunc("/api/v0/health", s.Health).Methods(http.MethodGet)
 
-	return http.ListenAndServe(s.listenAddress, mux)
+	// Device management
+	r.HandleFunc("/api/v0/devices", s.CreateDevice).Methods(http.MethodPost)
+
+	// Transaction signing
+	r.HandleFunc("/api/v0/devices/{deviceId}/sign", s.SignTransaction).Methods(http.MethodPost)
+
+	return http.ListenAndServe(s.listenAddress, r)
 }
 
 // WriteInternalError writes a default internal error message as an HTTP response.
