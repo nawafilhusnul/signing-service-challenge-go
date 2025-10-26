@@ -90,3 +90,13 @@ func (s *Server) GetDevice(w http.ResponseWriter, r *http.Request) {
 
 	WriteAPIResponse(w, http.StatusOK, device)
 }
+
+func (s *Server) GetAllDevices(w http.ResponseWriter, r *http.Request) {
+	devices, err := s.deviceService.FindAll()
+	if err != nil {
+		WriteErrorResponse(w, http.StatusInternalServerError, []string{err.Error()})
+		return
+	}
+
+	WriteAPIResponse(w, http.StatusOK, devices)
+}

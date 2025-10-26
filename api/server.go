@@ -56,6 +56,9 @@ func (s *Server) Run() error {
 	// Device retrieval
 	r.HandleFunc("/api/v0/devices/{deviceId}", s.GetDevice).Methods(http.MethodGet)
 
+	// Device retrieval
+	r.HandleFunc("/api/v0/devices", s.GetAllDevices).Methods(http.MethodGet)
+
 	return http.ListenAndServe(s.listenAddress, r)
 }
 

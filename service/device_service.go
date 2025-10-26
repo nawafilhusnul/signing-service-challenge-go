@@ -12,6 +12,7 @@ import (
 type DeviceService interface {
 	CreateDevice(device *domain.Device) error
 	GetDevice(deviceID string) (*domain.Device, error)
+	FindAll() ([]*domain.Device, error)
 	SignTransaction(deviceID string, data string) (*domain.SignatureResult, error)
 }
 
@@ -81,4 +82,8 @@ func (s *deviceService) SignTransaction(deviceID string, data string) (*domain.S
 
 func (s *deviceService) GetDevice(deviceID string) (*domain.Device, error) {
 	return s.repository.GetByID(deviceID)
+}
+
+func (s *deviceService) FindAll() ([]*domain.Device, error) {
+	return s.repository.FindAll()
 }
